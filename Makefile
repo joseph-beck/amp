@@ -8,8 +8,12 @@ all:
 	$(GO) run cmd/cli/main.go
 
 .phony: build
+ifeq ($(v),1)
+BUILD_FLAGS = -v
+endif
+
 build:
-	$(GO) build -o build/program/app cmd/cli/main.go
+	$(GO) build $(BUILD_FLAGS) -o build/program/app cmd/cli/main.go
 
 .phony: clean
 clean:
