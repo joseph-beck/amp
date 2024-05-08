@@ -68,19 +68,33 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 	}
 }
 
-func (m *Mux) Make(fn Handler) http.HandlerFunc {
+func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := newCtx(w, r)
-		err := fn(ctx)
-		if err != nil {
-			fmt.Println(err)
+
+		if len(middleware) > 0 {
+			for _, m := range middleware {
+				err := m(ctx)
+				if err != nil {
+					slog.Error(err.Error())
+					return
+				}
+			}
 		}
+
+		err := handler(ctx)
+		if err != nil {
+			slog.Error(err.Error())
+			return
+		}
+
+		slog.Info("nil")
 	}
 }
 
-func (m *Mux) Get(path string, handler Handler) {
+func (m *Mux) Get(path string, handler Handler, middleware ...Handler) {
 	slog.Info("GET " + path)
-	m.mux.HandleFunc(fmt.Sprintf("GET %s", path), m.Make(handler))
+	m.mux.HandleFunc(fmt.Sprintf("GET %s", path), m.Make(handler, middleware...))
 }
 
 func (m *Mux) ListenAndServe() error {

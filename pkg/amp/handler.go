@@ -2,7 +2,7 @@ package amp
 
 import "net/http"
 
-type Handler func(c *Ctx) error
+type Handler func(ctx *Ctx) error
 
 func (h Handler) Unwrap() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
