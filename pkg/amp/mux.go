@@ -3,7 +3,9 @@ package amp
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
+	"sync"
 )
 
 const amp = `
@@ -54,6 +56,31 @@ func New(config ...Config) Mux {
 		crt:  c.crt,
 		key:  c.key,
 	}
+}
+
+func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
+	return &Ctx{
+		writer:  w,
+		request: r,
+
+		values:   make(map[string]any),
+		valuesMu: sync.Mutex{},
+	}
+}
+
+func (m *Mux) Make(fn Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := newCtx(w, r)
+		err := fn(ctx)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
+func (m *Mux) Get(path string, handler Handler) {
+	slog.Info("GET " + path)
+	m.mux.HandleFunc(fmt.Sprintf("GET %s", path), m.Make(handler))
 }
 
 func (m *Mux) ListenAndServe() error {

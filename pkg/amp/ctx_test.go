@@ -1,28 +1,20 @@
 package amp
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func newCtx() Ctx {
-	return Ctx{
-		values:   make(map[string]any),
-		valuesMu: sync.Mutex{},
-	}
-}
-
 func TestCtxSet(t *testing.T) {
-	ctx := newCtx()
+	ctx := newCtx(nil, nil)
 
 	ctx.Set("key", "value")
 	assert.Equal(t, ctx.values["key"], "value")
 }
 
 func TestCtxGet(t *testing.T) {
-	ctx := newCtx()
+	ctx := newCtx(nil, nil)
 
 	ctx.Set("key", "value")
 	val, err := ctx.Get("key")
