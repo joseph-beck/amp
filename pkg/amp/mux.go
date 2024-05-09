@@ -117,6 +117,10 @@ func (m *Mux) Get(path string, handler Handler, middleware ...Handler) {
 	m.mux.HandleFunc(fmt.Sprintf("GET %s", path), m.Make(handler, middleware...))
 }
 
+func (m *Mux) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	m.mux.ServeHTTP(writer, request)
+}
+
 func (m *Mux) ListenAndServe() error {
 	fmt.Print(amp)
 
