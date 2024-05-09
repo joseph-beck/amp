@@ -88,7 +88,7 @@ func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 			return
 		}
 
-		slog.Info("nil")
+		slog.Info(fmt.Sprintf("%s %s %d", ctx.Method(), ctx.Path(), ctx.status))
 	}
 }
 
