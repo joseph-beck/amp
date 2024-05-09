@@ -35,11 +35,12 @@ func Default() Config {
 }
 
 type Mux struct {
-	mux  *http.ServeMux
-	port uint
-	host string
-	crt  string
-	key  string
+	mux        *http.ServeMux
+	port       uint
+	host       string
+	crt        string
+	key        string
+	middleware []Handler
 }
 
 func New(config ...Config) Mux {
@@ -50,11 +51,12 @@ func New(config ...Config) Mux {
 	}
 
 	return Mux{
-		mux:  http.NewServeMux(),
-		port: c.port,
-		host: c.host,
-		crt:  c.crt,
-		key:  c.key,
+		mux:        http.NewServeMux(),
+		port:       c.port,
+		host:       c.host,
+		crt:        c.crt,
+		key:        c.key,
+		middleware: make([]Handler, 0),
 	}
 }
 
@@ -71,6 +73,16 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := newCtx(w, r)
+
+		if len(m.middleware) > 0 {
+			for _, m := range m.middleware {
+				err := m(ctx)
+				if err != nil {
+					slog.Error(err.Error())
+					return
+				}
+			}
+		}
 
 		if len(middleware) > 0 {
 			for _, m := range middleware {
@@ -90,6 +102,14 @@ func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 
 		slog.Info(fmt.Sprintf("%s %s %d", ctx.Method(), ctx.Path(), ctx.status))
 	}
+}
+
+func (m *Mux) Use(middleware ...Handler) {
+	if len(middleware) <= 0 {
+		return
+	}
+
+	m.middleware = append(m.middleware, middleware...)
 }
 
 func (m *Mux) Get(path string, handler Handler, middleware ...Handler) {

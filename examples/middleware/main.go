@@ -24,6 +24,8 @@ func handler() amp.Handler {
 func main() {
 	a := amp.New()
 
+	a.Use(middleware())
+
 	a.Get("/", handler(), middleware())
 
 	log.Fatalln(a.ListenAndServe())
