@@ -173,7 +173,7 @@ func TestCtxQuery(t *testing.T) {
 	amp.ServeHTTP(writer, request)
 
 	amp.Get("/test/two", func(ctx *Ctx) error {
-		val, err := ctx.Query("key", "value")
+		val, err := ctx.Query("query", "value")
 		assert.NoError(t, err)
 		assert.Equal(t, "value", val)
 
@@ -185,9 +185,129 @@ func TestCtxQuery(t *testing.T) {
 	amp.ServeHTTP(writer, request)
 
 	amp.Get("/test/three", func(ctx *Ctx) error {
-		val, err := ctx.Query("key")
+		val, err := ctx.Query("query")
 		assert.Error(t, err)
 		assert.Equal(t, "", val)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/three", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxQueryInt(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		val, err := ctx.QueryInt("query")
+		assert.NoError(t, err)
+		assert.Equal(t, 1, val)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one?query=1", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		val, err := ctx.QueryInt("query", 1)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, val)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/three", func(ctx *Ctx) error {
+		val, err := ctx.QueryInt("query")
+		assert.Error(t, err)
+		assert.Equal(t, 0, val)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/three", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxQueryFloat(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		val, err := ctx.QueryFloat("query")
+		assert.NoError(t, err)
+		assert.Equal(t, float64(1), val)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one?query=1.0", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		val, err := ctx.QueryFloat("query", float64(1))
+		assert.NoError(t, err)
+		assert.Equal(t, float64(1), val)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/three", func(ctx *Ctx) error {
+		val, err := ctx.QueryFloat("query")
+		assert.Error(t, err)
+		assert.Equal(t, float64(0), val)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/three", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxQueryBool(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		val, err := ctx.QueryBool("query")
+		assert.NoError(t, err)
+		assert.Equal(t, true, val)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one?query=true", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		val, err := ctx.QueryBool("query", true)
+		assert.NoError(t, err)
+		assert.Equal(t, true, val)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/three", func(ctx *Ctx) error {
+		val, err := ctx.QueryBool("query")
+		assert.Error(t, err)
+		assert.Equal(t, false, val)
 
 		return nil
 	})

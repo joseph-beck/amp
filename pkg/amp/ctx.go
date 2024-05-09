@@ -116,6 +116,63 @@ func (ctx *Ctx) Query(key string, def ...string) (string, error) {
 	return qry.Get(key), nil
 }
 
+// Get a query of type int from the Ctx, this will return the default if it has any, otherwise it will error.
+func (ctx *Ctx) QueryInt(key string, def ...int) (int, error) {
+	qry := ctx.request.URL.Query()
+	if !qry.Has(key) {
+		if len(def) > 0 {
+			return def[0], nil
+		}
+
+		return 0, errors.New("error, query not found and no default was given")
+	}
+
+	val, err := strconv.Atoi(qry.Get(key))
+	if err != nil {
+		return 0, err
+	}
+
+	return val, nil
+}
+
+// Get a query of type float from the Ctx, this will return the default if it has any, otherwise it will error.
+func (ctx *Ctx) QueryFloat(key string, def ...float64) (float64, error) {
+	qry := ctx.request.URL.Query()
+	if !qry.Has(key) {
+		if len(def) > 0 {
+			return def[0], nil
+		}
+
+		return 0, errors.New("error, query not found and no default was given")
+	}
+
+	val, err := strconv.ParseFloat(qry.Get(key), 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return val, nil
+}
+
+// Get a query of type bool from the Ctx, this will return the default if it has any, otherwise it will error.
+func (ctx *Ctx) QueryBool(key string, def ...bool) (bool, error) {
+	qry := ctx.request.URL.Query()
+	if !qry.Has(key) {
+		if len(def) > 0 {
+			return def[0], nil
+		}
+
+		return false, errors.New("error, query not found and no default was given")
+	}
+
+	val, err := strconv.ParseBool(qry.Get(key))
+	if err != nil {
+		return false, err
+	}
+
+	return val, nil
+}
+
 // Set the status of the current Ctx.
 func (ctx *Ctx) Status(status int) {
 	ctx.status = status
