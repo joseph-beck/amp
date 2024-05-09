@@ -3,6 +3,7 @@ package amp
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -51,6 +52,51 @@ func (ctx *Ctx) Param(key string) (string, error) {
 	val := ctx.request.PathValue(key)
 	if val == "" {
 		return "", errors.New("error, param not found")
+	}
+
+	return val, nil
+}
+
+// Get a param of type int from the Ctx, this will error if the param cannot be found or cannot be converted.
+func (ctx *Ctx) ParamInt(key string) (int, error) {
+	str, err := ctx.Param(key)
+	if err != nil {
+		return 0, err
+	}
+
+	val, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, err
+	}
+
+	return val, nil
+}
+
+// Get a param of type float from the Ctx, this will error if the param cannot be found or cannot be converted.
+func (ctx *Ctx) ParamFloat(key string) (float64, error) {
+	str, err := ctx.Param(key)
+	if err != nil {
+		return 0, err
+	}
+
+	val, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return val, nil
+}
+
+// Get a param of type boolean from the Ctx, this will error if the param cannot be found or cannot be converted.
+func (ctx *Ctx) ParamBool(key string) (bool, error) {
+	str, err := ctx.Param(key)
+	if err != nil {
+		return false, err
+	}
+
+	val, err := strconv.ParseBool(str)
+	if err != nil {
+		return false, err
 	}
 
 	return val, nil
