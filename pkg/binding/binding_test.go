@@ -10,10 +10,6 @@ type Mock struct {
 	Key string `binding:"required"`
 }
 
-func TestReadBody(t *testing.T) {
-
-}
-
 func TestValidateStruct(t *testing.T) {
 	// test validator
 
