@@ -2,11 +2,17 @@ package amp
 
 import (
 	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/joseph-beck/amp/pkg/binding"
 	"github.com/joseph-beck/amp/pkg/status"
 	"github.com/stretchr/testify/assert"
 )
+
+type Mock struct {
+	Key string `json:"key"`
+}
 
 func TestCtxSet(t *testing.T) {
 	ctx := newCtx(nil, nil)
@@ -332,6 +338,78 @@ func TestCtxStatus(t *testing.T) {
 	amp.ServeHTTP(writer, request)
 }
 
+func TestCtxAborted(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		assert.Equal(t, false, ctx.Aborted())
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		ctx.aborted = true
+		assert.Equal(t, true, ctx.Aborted())
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxAbort(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		ctx.Abort()
+		assert.Equal(t, true, ctx.aborted)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxAbortWithStatus(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		ctx.AbortWithStatus(status.BadRequest)
+		assert.Equal(t, true, ctx.aborted)
+		assert.Equal(t, status.BadRequest, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxAbortWithError(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		ctx.AbortWithError(status.BadRequest, nil)
+		assert.Equal(t, true, ctx.aborted)
+		assert.Equal(t, status.BadRequest, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
 func TestCtxWrite(t *testing.T) {
 	amp := New()
 
@@ -391,5 +469,123 @@ func TestCtxRenderBytes(t *testing.T) {
 
 	request := httptest.NewRequest("GET", "/test/one", nil)
 	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxShouldBindWith(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindWith(&obj, binding.JSON)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`{"key": "value"}`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindWith(&obj, binding.JSON)
+		assert.Error(t, err)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxMustBindWith(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.MustBindWith(&obj, binding.JSON)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`{"key": "value"}`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.MustBindWith(&obj, binding.JSON)
+		assert.Error(t, err)
+		assert.Equal(t, true, ctx.aborted)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxShouldBindJSON(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindJSON(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`{"key": "value"}`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindJSON(&obj)
+		assert.Error(t, err)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxBindJSON(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindJSON(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`{"key": "value"}`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindJSON(&obj)
+		assert.Error(t, err)
+		assert.Equal(t, true, ctx.aborted)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
 	amp.ServeHTTP(writer, request)
 }

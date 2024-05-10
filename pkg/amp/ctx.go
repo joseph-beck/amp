@@ -5,12 +5,15 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+
+	"github.com/joseph-beck/amp/pkg/binding"
 )
 
 type Ctx struct {
 	writer  http.ResponseWriter
 	request *http.Request
 	status  int
+	aborted bool
 
 	values   map[string]any
 	valuesMu sync.Mutex
@@ -179,6 +182,24 @@ func (ctx *Ctx) Status(status int) {
 	ctx.writer.WriteHeader(status)
 }
 
+func (ctx *Ctx) Aborted() bool {
+	return ctx.aborted
+}
+
+func (ctx *Ctx) Abort() {
+	ctx.aborted = true
+}
+
+func (ctx *Ctx) AbortWithStatus(status int) {
+	ctx.Abort()
+	ctx.Status(status)
+}
+
+func (ctx *Ctx) AbortWithError(status int, err error) {
+	ctx.Abort()
+	ctx.AbortWithStatus(status)
+}
+
 // Write a string to the Ctx writer.
 func (ctx *Ctx) Write(body string) (int, error) {
 	b, err := ctx.writer.Write([]byte(body))
@@ -221,4 +242,30 @@ func (ctx *Ctx) RenderBytes(status int, body []byte) error {
 	}
 
 	return nil
+}
+
+// Returns an error if any binding errors occur with object, does not enforce any behaviour.
+func (ctx *Ctx) ShouldBindWith(obj any, binder binding.Binder) error {
+	return binder.Bind(ctx.request, obj)
+}
+
+// Enforces that an object has binded, otherwise an error is returned and the context is aborted.
+func (ctx *Ctx) MustBindWith(obj any, binder binding.Binder) error {
+	err := ctx.ShouldBindWith(obj, binder)
+	if err != nil {
+		ctx.Abort()
+		return err
+	}
+
+	return nil
+}
+
+// Bind an object reference to some JSON.
+func (ctx *Ctx) ShouldBindJSON(obj any) error {
+	return ctx.ShouldBindWith(obj, binding.JSON)
+}
+
+// Bind an object reference to some JSON.
+func (ctx *Ctx) BindJSON(obj any) error {
+	return ctx.MustBindWith(obj, binding.JSON)
 }
