@@ -57,4 +57,11 @@ func TestJSONBindingBindBody(t *testing.T) {
 
 	err = binder.BindBody(data, &obj)
 	assert.Error(t, err)
+
+	val := make(map[string]string)
+	err = binder.BindBody([]byte(`{"key": "value","other": "field"}`), &val)
+	assert.NoError(t, err)
+	assert.Len(t, val, 2)
+	assert.Equal(t, "value", val["key"])
+	assert.Equal(t, "field", val["other"])
 }
