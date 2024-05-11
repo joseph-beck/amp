@@ -9,8 +9,8 @@ import (
 )
 
 func TestYAMLBindingName(t *testing.T) {
-	binder := tomlBinding{}
-	assert.Equal(t, "toml", binder.Name())
+	binder := yamlBinding{}
+	assert.Equal(t, "yaml", binder.Name())
 }
 
 func TestYAMLBindingBind(t *testing.T) {
@@ -48,6 +48,7 @@ func TestYAMLBindingBindBody(t *testing.T) {
 	assert.Error(t, err)
 
 	val := make(map[string]string)
+	// multiple values for yaml look horrible here, but it works
 	err = binder.BindBody([]byte(`key: value`), &val)
 	assert.NoError(t, err)
 	assert.Len(t, val, 1)
