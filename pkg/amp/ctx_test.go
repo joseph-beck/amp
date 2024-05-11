@@ -11,7 +11,7 @@ import (
 )
 
 type Mock struct {
-	Key string `json:"key"`
+	Key string `json:"key" xml:"key" toml:"key" yaml:"key"`
 }
 
 func TestCtxSet(t *testing.T) {
@@ -586,6 +586,193 @@ func TestCtxBindJSON(t *testing.T) {
 	})
 
 	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxShouldBindTOML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindTOML(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`key = "value"`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindTOML(&obj)
+		assert.Error(t, err)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", strings.NewReader(`key = key`))
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxBindTOML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindTOML(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`key = "value"`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindTOML(&obj)
+		assert.Error(t, err)
+		assert.Equal(t, true, ctx.aborted)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", strings.NewReader(`key = key`))
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxShouldBindYAML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindYAML(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`key: value`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindYAML(&obj)
+		assert.Error(t, err)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", strings.NewReader(`key`))
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxBindYAML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindYAML(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`key: value`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindYAML(&obj)
+		assert.Error(t, err)
+		assert.Equal(t, true, ctx.aborted)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", strings.NewReader(`key`))
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxShouldBindXML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindXML(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<root>
+			<key>value</key>
+		</root>
+	`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.ShouldBindXML(&obj)
+		assert.Error(t, err)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", strings.NewReader(`key`))
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxBindXML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindXML(&obj)
+		assert.NoError(t, err)
+		assert.Equal(t, "value", obj.Key)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", strings.NewReader(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<root>
+   			<key>value</key>
+		</root>
+	`))
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		var obj Mock
+		err := ctx.BindXML(&obj)
+		assert.Error(t, err)
+		assert.Equal(t, true, ctx.aborted)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", strings.NewReader(`key`))
 	writer = httptest.NewRecorder()
 	amp.ServeHTTP(writer, request)
 }
