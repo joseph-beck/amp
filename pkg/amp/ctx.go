@@ -265,7 +265,37 @@ func (ctx *Ctx) ShouldBindJSON(obj any) error {
 	return ctx.ShouldBindWith(obj, binding.JSON)
 }
 
-// Bind an object reference to some JSON.
+// Bind an object reference to some JSON, will abort if it fails to bind.
 func (ctx *Ctx) BindJSON(obj any) error {
 	return ctx.MustBindWith(obj, binding.JSON)
+}
+
+// Bind an object reference to some TOML.
+func (ctx *Ctx) ShouldBindTOML(obj any) error {
+	return ctx.ShouldBindWith(obj, binding.TOML)
+}
+
+// Bind an object reference to some TOML, will abort if it fails to bind.
+func (ctx *Ctx) BindTOML(obj any) error {
+	return ctx.MustBindWith(obj, binding.TOML)
+}
+
+// Bind an object reference to some YAML.
+func (ctx *Ctx) ShouldBindYAML(obj any) error {
+	return ctx.ShouldBindWith(obj, binding.YAML)
+}
+
+// Bind an object reference to some YAML, will abort if it fails to bind.
+func (ctx *Ctx) BindYAML(obj any) error {
+	return ctx.MustBindWith(obj, binding.YAML)
+}
+
+// Bind an object reference to some XML.
+func (ctx *Ctx) ShouldBindXML(obj any) error {
+	return ctx.ShouldBindWith(obj, binding.XML)
+}
+
+// Bind an object reference to some XML, will abort if it fails to bind.
+func (ctx *Ctx) BindXML(obj any) error {
+	return ctx.MustBindWith(obj, binding.XML)
 }

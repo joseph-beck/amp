@@ -64,7 +64,7 @@ func TestXMLBindingBindBody(t *testing.T) {
 	assert.Error(t, err)
 
 	var val struct {
-		Key string `xml:"key"`
+		Key   string `xml:"key"`
 		Field string `xml:"field"`
 	}
 	err = binder.BindBody([]byte(`
