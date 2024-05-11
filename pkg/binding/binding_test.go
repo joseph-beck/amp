@@ -7,7 +7,7 @@ import (
 )
 
 type Mock struct {
-	Key string `binding:"required" json:"key" toml:"key" yaml:"key"`
+	Key string `binding:"required" json:"key" toml:"key" yaml:"key" xml:"key"`
 }
 
 func TestValidateStruct(t *testing.T) {
