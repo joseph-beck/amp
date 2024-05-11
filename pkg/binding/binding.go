@@ -21,6 +21,7 @@ type Binder interface {
 var (
 	JSON = jsonBinding{}
 	TOML = tomlBinding{}
+	YAML = yamlBinding{}
 )
 
 func readBody(request *http.Request) (*bytes.Buffer, error) {

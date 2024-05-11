@@ -20,5 +20,5 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/pelletier/go-toml/v2 v2.2.2
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1
 )
