@@ -14,10 +14,26 @@ type Mock struct {
 	Key string `json:"key" xml:"key" toml:"key" yaml:"key"`
 }
 
+func TestWriteContentType(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test", func(ctx *Ctx) error {
+		err := ctx.RenderString(status.OK, "value")
+		assert.NoError(t, err)
+		assert.Equal(t, plainContentType, ctx.writer.Header()["Content-Type"])
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
 func TestCtxWriter(t *testing.T) {
 	amp := New()
 
-	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+	amp.Get("/test", func(ctx *Ctx) error {
 		w := ctx.Writer()
 		assert.Equal(t, ctx.writer, w)
 
@@ -32,7 +48,7 @@ func TestCtxWriter(t *testing.T) {
 func TestCtxSetWriter(t *testing.T) {
 	amp := New()
 
-	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+	amp.Get("/test", func(ctx *Ctx) error {
 		w := httptest.NewRecorder()
 		ctx.SetWriter(w)
 		assert.Equal(t, ctx.writer, w)
@@ -48,7 +64,7 @@ func TestCtxSetWriter(t *testing.T) {
 func TestCtxRequest(t *testing.T) {
 	amp := New()
 
-	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+	amp.Get("/test", func(ctx *Ctx) error {
 		r := ctx.Request()
 		assert.Equal(t, ctx.request, r)
 
@@ -63,7 +79,7 @@ func TestCtxRequest(t *testing.T) {
 func TestCtxSetRequest(t *testing.T) {
 	amp := New()
 
-	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+	amp.Get("/test", func(ctx *Ctx) error {
 		r := httptest.NewRequest("GET", "/test", nil)
 		ctx.SetRequest(r)
 		assert.Equal(t, ctx.request, r)
@@ -523,6 +539,98 @@ func TestCtxRenderBytes(t *testing.T) {
 
 	amp.Get("/test/one", func(ctx *Ctx) error {
 		err := ctx.RenderBytes(status.OK, []byte("write"))
+		assert.NoError(t, err)
+		assert.Equal(t, status.OK, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxRenderString(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		err := ctx.RenderString(status.OK, "write")
+		assert.NoError(t, err)
+		assert.Equal(t, status.OK, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+
+	amp.Get("/test/two", func(ctx *Ctx) error {
+		err := ctx.RenderString(status.OK, "write %d", 123)
+		assert.NoError(t, err)
+		assert.Equal(t, status.OK, ctx.status)
+
+		return nil
+	})
+
+	request = httptest.NewRequest("GET", "/test/two", nil)
+	writer = httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxRenderJSON(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		err := ctx.RenderJSON(status.OK, Mock{Key: "value"})
+		assert.NoError(t, err)
+		assert.Equal(t, status.OK, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxRenderTOML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		err := ctx.RenderTOML(status.OK, Mock{Key: "value"})
+		assert.NoError(t, err)
+		assert.Equal(t, status.OK, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxRenderYAML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		err := ctx.RenderYAML(status.OK, Mock{Key: "value"})
+		assert.NoError(t, err)
+		assert.Equal(t, status.OK, ctx.status)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test/one", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxRenderXML(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one", func(ctx *Ctx) error {
+		err := ctx.RenderXML(status.OK, Mock{Key: "value"})
 		assert.NoError(t, err)
 		assert.Equal(t, status.OK, ctx.status)
 
