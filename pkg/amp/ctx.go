@@ -19,6 +19,26 @@ type Ctx struct {
 	valuesMu sync.Mutex
 }
 
+// Get the writer from the Ctx.
+func (ctx *Ctx) Writer() http.ResponseWriter {
+	return ctx.writer
+}
+
+// Set the writer of the Ctx.
+func (ctx *Ctx) SetWriter(writer http.ResponseWriter) {
+	ctx.writer = writer
+}
+
+// Get request of the Ctx.
+func (ctx *Ctx) Request() *http.Request {
+	return ctx.request
+}
+
+// Set the request of the Ctx.
+func (ctx *Ctx) SetRequest(request *http.Request) {
+	ctx.request = request
+}
+
 // Set a value in the Ctx values map.
 func (ctx *Ctx) Set(key string, val any) {
 	ctx.valuesMu.Lock()

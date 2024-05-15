@@ -14,6 +14,68 @@ type Mock struct {
 	Key string `json:"key" xml:"key" toml:"key" yaml:"key"`
 }
 
+func TestCtxWriter(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+		w := ctx.Writer()
+		assert.Equal(t, ctx.writer, w)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxSetWriter(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+		w := httptest.NewRecorder()
+		ctx.SetWriter(w)
+		assert.Equal(t, ctx.writer, w)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxRequest(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+		r := ctx.Request()
+		assert.Equal(t, ctx.request, r)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxSetRequest(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test/one/{key}", func(ctx *Ctx) error {
+		r := httptest.NewRequest("GET", "/test", nil)
+		ctx.SetRequest(r)
+		assert.Equal(t, ctx.request, r)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
 func TestCtxSet(t *testing.T) {
 	ctx := newCtx(nil, nil)
 
