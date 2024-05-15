@@ -305,7 +305,6 @@ func (ctx *Ctx) RenderJSON(status int, obj any) error {
 
 	body, err := json.Marshal(obj)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest)
 		return err
 	}
 
@@ -318,7 +317,6 @@ func (ctx *Ctx) RenderTOML(status int, obj any) error {
 
 	body, err := toml.Marshal(obj)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest)
 		return err
 	}
 
@@ -331,7 +329,6 @@ func (ctx *Ctx) RenderYAML(status int, obj any) error {
 
 	body, err := yaml.Marshal(obj)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest)
 		return err
 	}
 
@@ -344,7 +341,6 @@ func (ctx *Ctx) RenderXML(status int, obj any) error {
 
 	body, err := xml.Marshal(obj)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest)
 		return err
 	}
 
