@@ -1,12 +1,26 @@
 package amp
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
 
 	"github.com/joseph-beck/amp/pkg/binding"
+	"github.com/pelletier/go-toml/v2"
+	"gopkg.in/yaml.v3"
+)
+
+var (
+	jsonContentType  = []string{"application/json; charset=utf-8"}
+	tomlContentType  = []string{"application/toml; charset=utf-8"}
+	yamlContentType  = []string{"application/x-yaml; charset=utf-8"}
+	xmlContentType   = []string{"application/xml; charset=utf-8"}
+	htmlContentType  = []string{"text/html; charset=utf-8"}
+	plainContentType = []string{"text/plain; charset=utf-8"}
 )
 
 type Ctx struct {
@@ -17,6 +31,35 @@ type Ctx struct {
 
 	values   map[string]any
 	valuesMu sync.Mutex
+}
+
+// Write the content type of the writer of the Ctx.
+func writeContentType(writer http.ResponseWriter, content []string) {
+	header := writer.Header()
+	val := header["Content-Type"]
+	if len(val) == 0 {
+		header["Content-Type"] = content
+	}
+}
+
+// Get the writer from the Ctx.
+func (ctx *Ctx) Writer() http.ResponseWriter {
+	return ctx.writer
+}
+
+// Set the writer of the Ctx.
+func (ctx *Ctx) SetWriter(writer http.ResponseWriter) {
+	ctx.writer = writer
+}
+
+// Get request of the Ctx.
+func (ctx *Ctx) Request() *http.Request {
+	return ctx.request
+}
+
+// Set the request of the Ctx.
+func (ctx *Ctx) SetRequest(request *http.Request) {
+	ctx.request = request
 }
 
 // Set a value in the Ctx values map.
@@ -240,6 +283,75 @@ func (ctx *Ctx) RenderBytes(status int, body []byte) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+// Render an obj in a JSON format, with a given status code.
+func (ctx *Ctx) RenderString(status int, obj string, params ...any) error {
+	writeContentType(ctx.writer, plainContentType)
+
+	if len(params) > 0 {
+		val := fmt.Sprintf(obj, params...)
+		return ctx.RenderBytes(status, []byte(val))
+	}
+
+	return ctx.RenderBytes(status, []byte(obj))
+}
+
+// Render an obj in a JSON format, with a given status code.
+func (ctx *Ctx) RenderJSON(status int, obj any) error {
+	writeContentType(ctx.writer, jsonContentType)
+
+	body, err := json.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	return ctx.RenderBytes(status, body)
+}
+
+// Render an obj in a TOML format, with a given status code.
+func (ctx *Ctx) RenderTOML(status int, obj any) error {
+	writeContentType(ctx.writer, tomlContentType)
+
+	body, err := toml.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	return ctx.RenderBytes(status, body)
+}
+
+// Render an obj in a YAML format, with a given status code.
+func (ctx *Ctx) RenderYAML(status int, obj any) error {
+	writeContentType(ctx.writer, yamlContentType)
+
+	body, err := yaml.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	return ctx.RenderBytes(status, body)
+}
+
+// Render an obj in a XML format, with a given status code.
+func (ctx *Ctx) RenderXML(status int, obj any) error {
+	writeContentType(ctx.writer, xmlContentType)
+
+	body, err := xml.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	return ctx.RenderBytes(status, body)
+}
+
+// Render a given HTML file with a given status code.
+func (ctx *Ctx) RenderHTML(status int, file string) error {
+	writeContentType(ctx.writer, htmlContentType)
+
+	// TODO: html rendering
 
 	return nil
 }
