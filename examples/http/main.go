@@ -15,6 +15,12 @@ func getRoot() amp.Handler {
 	}
 }
 
+func postRoot() amp.Handler {
+	return func(ctx *amp.Ctx) error {
+		return ctx.Render(status.OK, "post from root")
+	}
+}
+
 func getError() amp.Handler {
 	return func(ctx *amp.Ctx) error {
 		return errors.New("error")
@@ -36,6 +42,8 @@ func main() {
 	a := amp.New()
 
 	a.Get("/", getRoot())
+
+	a.Post("/", postRoot())
 
 	a.Get("/name/{name}", getParam())
 
