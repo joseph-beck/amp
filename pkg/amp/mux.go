@@ -43,11 +43,11 @@ type Mux struct {
 	middleware []Handler
 }
 
-func New(config ...Config) Mux {
+func New(args ...Config) Mux {
 	c := Default()
 
-	if len(config) > 0 {
-		c = config[0]
+	if len(args) > 0 {
+		c = args[0]
 	}
 
 	return Mux{
@@ -67,34 +67,19 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 
 		values:   make(map[string]any),
 		valuesMu: sync.Mutex{},
+
+		handlers: []Handler{},
+		index:    0,
 	}
 }
 
 func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := newCtx(w, r)
+		ctx.handlers = append(m.middleware, middleware...)
+		ctx.handlers = append(ctx.handlers, handler)
 
-		if len(m.middleware) > 0 {
-			for _, m := range m.middleware {
-				err := m(ctx)
-				if err != nil {
-					slog.Error(err.Error())
-					return
-				}
-			}
-		}
-
-		if len(middleware) > 0 {
-			for _, m := range middleware {
-				err := m(ctx)
-				if err != nil {
-					slog.Error(err.Error())
-					return
-				}
-			}
-		}
-
-		err := handler(ctx)
+		err := ctx.Next()
 		if err != nil {
 			slog.Error(err.Error())
 			return

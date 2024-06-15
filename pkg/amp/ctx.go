@@ -31,6 +31,9 @@ type Ctx struct {
 
 	values   map[string]any
 	valuesMu sync.Mutex
+
+	handlers []Handler
+	index    int
 }
 
 // Write the content type of the writer of the Ctx.
@@ -91,6 +94,16 @@ func (ctx *Ctx) Path() string {
 // Get the method of the current Ctx.
 func (ctx *Ctx) Method() string {
 	return ctx.request.Method
+}
+
+// Go to the next method in the Ctx.
+func (ctx *Ctx) Next() error {
+	ctx.index++
+	if ctx.index < len(ctx.handlers) {
+		return ctx.handlers[ctx.index](ctx)
+	}
+
+	return nil
 }
 
 // Get a param from the Ctx, this will error if the param cannot be found.

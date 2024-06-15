@@ -141,6 +141,27 @@ func TestCtxMethod(t *testing.T) {
 	amp.ServeHTTP(writer, request)
 }
 
+func TestCtxNext(t *testing.T) {
+	amp := New()
+
+	amp.Get(
+		"/test",
+		func(ctx *Ctx) error {
+			idx := ctx.index
+			assert.Equal(t, 1, idx)
+
+			return nil
+		},
+		func(ctx *Ctx) error {
+			return ctx.Next()
+		},
+	)
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
 func TestCtxParam(t *testing.T) {
 	amp := New()
 
