@@ -96,6 +96,11 @@ func (ctx *Ctx) Method() string {
 	return ctx.request.Method
 }
 
+// Set a header value in the current Ctx.
+func (ctx *Ctx) Header(key string, value string) {
+	ctx.writer.Header().Add(key, value)
+}
+
 // Go to the next method in the Ctx.
 func (ctx *Ctx) Next() error {
 	ctx.index++
