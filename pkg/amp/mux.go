@@ -69,14 +69,15 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 		valuesMu: sync.Mutex{},
 
 		handlers: []Handler{},
-		index:    0,
+		index:    -1,
 	}
 }
 
 func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := newCtx(w, r)
-		ctx.handlers = append(m.middleware, middleware...)
+		ctx.handlers = append(ctx.handlers, m.middleware...)
+		ctx.handlers = append(ctx.handlers, middleware...)
 		ctx.handlers = append(ctx.handlers, handler)
 
 		err := ctx.Next()

@@ -99,7 +99,7 @@ func (ctx *Ctx) Method() string {
 // Go to the next method in the Ctx.
 func (ctx *Ctx) Next() error {
 	ctx.index++
-	if ctx.index < len(ctx.handlers) {
+	if ctx.index <= len(ctx.handlers) {
 		return ctx.handlers[ctx.index](ctx)
 	}
 
