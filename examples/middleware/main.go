@@ -45,7 +45,7 @@ func postHandler() amp.Handler {
 func main() {
 	a := amp.New()
 
-	a.Use(cors.New())
+	a.Use(cors.New(cors.Default()))
 
 	a.Get("/", getHandler(), middleware())
 

@@ -121,7 +121,7 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 	return &Ctx{
 		writer:  w,
 		request: r,
-		status:  status.Processing,
+		status:  status.OK,
 		aborted: false,
 
 		values:   make(map[string]any),
@@ -152,7 +152,8 @@ func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 		// can still use Next for recursive Handler calling, less optimal.
 		for i, h := range ctx.handlers {
 			// we can skip within our handlers, if the index does not match, lets keep iterating.
-			if ctx.index+1 != i {
+			ctx.index++
+			if ctx.index != i {
 				continue
 			}
 
@@ -243,7 +244,7 @@ func (m *Mux) ListenAndServe() error {
 		m.addOptions()
 	}
 
-	fmt.Print(amp)
+	fmt.Print(amp + "\n")
 
 	return http.ListenAndServe(fmt.Sprintf("%s:%d", m.host, m.port), m.mux)
 }
@@ -257,7 +258,7 @@ func (m *Mux) ListenAndServeTLS() error {
 		return errors.New("error, no crt or key given")
 	}
 
-	fmt.Print(amp)
+	fmt.Print(amp + "\n")
 
 	return http.ListenAndServeTLS(fmt.Sprintf("%s:%d", m.host, m.port), m.crt, m.key, m.mux)
 }

@@ -101,6 +101,11 @@ func (ctx *Ctx) Header(key string, value string) {
 	ctx.writer.Header().Add(key, value)
 }
 
+// Get the origin of the current Ctx.
+func (ctx *Ctx) Origin() string {
+	return ctx.request.Host
+}
+
 // Go to the next method in the Ctx.
 func (ctx *Ctx) Next() error {
 	ctx.index++
