@@ -10,6 +10,7 @@ import (
 	"github.com/joseph-beck/amp/pkg/status"
 )
 
+// Pretty logo <3
 const amp = `
 ________  _____ ______   ________   
 |\   __  \|\   _ \  _   \|\   __  \  
@@ -20,6 +21,8 @@ ________  _____ ______   ________
     \|__|\|__|\|__|     \|__|\|__|   
 `
 
+// Mux configs, allow you to customise the mux.
+// Used as an arg in the New(args ...config) function.
 type Config struct {
 	// Selects the port that AMP Mux will run on.
 	// The program will exit if the port is already in use.
@@ -43,6 +46,12 @@ type Config struct {
 	DefaultOptions bool
 }
 
+// Gives a default config,
+// Port: 8080,
+// Host : "",
+// CRT: "",
+// Key: "",
+// DefaultOptions: true,
 func Default() Config {
 	return Config{
 		Port:           8080,
@@ -53,6 +62,10 @@ func Default() Config {
 	}
 }
 
+// Mux, uses config to manipulate the mux.
+// Use Get, Post, etc. to add new methods.
+// To run use log.Fatalln(x.ListenAndServe()).
+// Can use HTTPS with ListenAndServeTLS().
 type Mux struct {
 	// Go net/http serverMux, used as the server.
 	mux *http.ServeMux
@@ -83,6 +96,9 @@ type Mux struct {
 	middleware []Handler
 }
 
+// Returns a new Mux.
+// Uses the given config, if len of args is greater than 0.
+// Otherwises uses the default configuration.
 func New(args ...Config) Mux {
 	c := Default()
 
@@ -124,14 +140,34 @@ func (m *Mux) addOptions() {
 func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := newCtx(w, r)
+
+		// constructs the func slice for the ctx, the is iterated on.
 		ctx.handlers = append(ctx.handlers, m.middleware...)
 		ctx.handlers = append(ctx.handlers, middleware...)
 		ctx.handlers = append(ctx.handlers, handler)
 
-		err := ctx.Next()
-		if err != nil {
-			slog.Error(err.Error())
-			return
+		// using iteration is preffered here.
+		// can still use Next for recursive Handler calling, less optimal.
+		for i, h := range ctx.handlers {
+			// we can skip within our handlers, if the index does not match, lets keep iterating.
+			if ctx.index+1 != i {
+				continue
+			}
+
+			// checks if the handler has an error, slogs it if it does.
+			err := h(ctx)
+			if err != nil {
+				slog.Error(err.Error())
+				return
+			}
+
+			// checks to see if the ctx was aborted.
+			// will exit the rest of the handlers if aborted.
+			// aborted ctx can be continued with the ctx.Next()
+			if ctx.aborted {
+				slog.Error(fmt.Sprintf("%s ABORTED %s %d", ctx.Method(), ctx.Path(), ctx.status))
+				return
+			}
 		}
 
 		slog.Info(fmt.Sprintf("%s %s %d", ctx.Method(), ctx.Path(), ctx.status))

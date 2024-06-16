@@ -243,19 +243,23 @@ func (ctx *Ctx) Status(status int) {
 	ctx.writer.WriteHeader(status)
 }
 
+// Checks if the Ctx has been aborted.
 func (ctx *Ctx) Aborted() bool {
 	return ctx.aborted
 }
 
+// Aborts the Ctx.
 func (ctx *Ctx) Abort() {
 	ctx.aborted = true
 }
 
+// Aborts the Ctx, with a given status.
 func (ctx *Ctx) AbortWithStatus(status int) {
 	ctx.Abort()
 	ctx.Status(status)
 }
 
+// Aborts the Ctx, with a given status and an error.
 func (ctx *Ctx) AbortWithError(status int, err error) {
 	ctx.Abort()
 	ctx.AbortWithStatus(status)

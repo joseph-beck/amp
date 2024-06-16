@@ -8,6 +8,12 @@ import (
 )
 
 func New(args ...Config) amp.Handler {
+	_ = Default()
+
+	if len(args) > 0 {
+		_ = args[0]
+	}
+
 	return func(ctx *amp.Ctx) error {
 		ctx.Header("Access-Control-Allow-Origin", "*")
 		ctx.Header("Access-Control-Allow-Credentials", "true")

@@ -13,7 +13,7 @@ func middleware() amp.Handler {
 	return func(ctx *amp.Ctx) error {
 		fmt.Println("middleware")
 
-		return ctx.Next()
+		return nil // can also use ctx.Next()
 	}
 }
 
