@@ -130,8 +130,39 @@ func TestCtxMethod(t *testing.T) {
 	amp := New()
 
 	amp.Get("/test", func(ctx *Ctx) error {
-		path := ctx.Method()
-		assert.Equal(t, "GET", path)
+		method := ctx.Method()
+		assert.Equal(t, "GET", method)
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxHeader(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test", func(ctx *Ctx) error {
+		header := "none"
+		ctx.Header("X-Auth", header)
+		assert.Equal(t, header, ctx.writer.Header().Get("X-Auth"))
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxOrigin(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test", func(ctx *Ctx) error {
+		origin := ctx.Origin()
+		assert.Equal(t, "example.com", origin)
 
 		return nil
 	})
