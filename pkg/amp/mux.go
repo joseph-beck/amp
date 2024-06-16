@@ -121,6 +121,8 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 	return &Ctx{
 		writer:  w,
 		request: r,
+		status:  status.Processing,
+		aborted: false,
 
 		values:   make(map[string]any),
 		valuesMu: sync.Mutex{},
@@ -165,7 +167,7 @@ func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 			// will exit the rest of the handlers if aborted.
 			// aborted ctx can be continued with the ctx.Next()
 			if ctx.aborted {
-				slog.Error(fmt.Sprintf("%s ABORTED %s %d", ctx.Method(), ctx.Path(), ctx.status))
+				slog.Info(fmt.Sprintf("%s ABORTED %s %d", ctx.Method(), ctx.Path(), ctx.status))
 				return
 			}
 		}
