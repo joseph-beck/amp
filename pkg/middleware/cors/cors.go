@@ -7,7 +7,7 @@ import (
 	"github.com/joseph-beck/amp/pkg/status"
 )
 
-func New() amp.Handler {
+func New(args ...Config) amp.Handler {
 	return func(ctx *amp.Ctx) error {
 		ctx.Header("Access-Control-Allow-Origin", "*")
 		ctx.Header("Access-Control-Allow-Credentials", "true")

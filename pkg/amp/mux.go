@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
+
+	"github.com/joseph-beck/amp/pkg/status"
 )
 
 const amp = `
@@ -19,27 +21,65 @@ ________  _____ ______   ________
 `
 
 type Config struct {
-	port uint
-	host string
-	crt  string
-	key  string
+	// Selects the port that AMP Mux will run on.
+	// The program will exit if the port is already in use.
+	Port uint
+
+	// Specify the host name the Mux that is on.
+	// This field is not required when using ListenAndServe.
+	Host string
+
+	// CRT is required when using TLS / HTTPS.
+	// This field is not required when using ListenAndServe.
+	CRT string
+
+	// Key is required when using TLS / HTTPS.
+	// This field is not required when using ListenAndServe.
+	Key string
+
+	// Adds an OPTIONS method that works for all routes, /*.
+	// This is used when doing pre-flight checks etc.
+	// Please have this set to true if you want CORS policies to work.
+	DefaultOptions bool
 }
 
 func Default() Config {
 	return Config{
-		port: 8080,
-		host: "",
-		crt:  "",
-		key:  "",
+		Port:           8080,
+		Host:           "",
+		CRT:            "",
+		Key:            "",
+		DefaultOptions: true,
 	}
 }
 
 type Mux struct {
-	mux        *http.ServeMux
-	port       uint
-	host       string
-	crt        string
-	key        string
+	// Go net/http serverMux, used as the server.
+	mux *http.ServeMux
+
+	// Port used by the Mux.
+	// Program will exit if the port is already bound.
+	port uint
+
+	// Specify the host name the Mux that is on.
+	// This field is not required.
+	host string
+
+	// CRT is required when using TLS / HTTPS.
+	// This field is not required when using ListenAndServe.
+	crt string
+
+	// Key is required when using TLS / HTTPS.
+	// This field is not required when using ListenAndServe.
+	key string
+
+	// Adds an OPTIONS method that works for all routes, /*.
+	// This is used when doing pre-flight checks etc.
+	// Please have this set to true if you want CORS policies to work.
+	defaultOptions bool
+
+	// Slice of Handlers used as middleware for all Handlers.
+	// Will only apply to Handlers used after the x.Use(...) statement.
 	middleware []Handler
 }
 
@@ -51,12 +91,13 @@ func New(args ...Config) Mux {
 	}
 
 	return Mux{
-		mux:        http.NewServeMux(),
-		port:       c.port,
-		host:       c.host,
-		crt:        c.crt,
-		key:        c.key,
-		middleware: make([]Handler, 0),
+		mux:            http.NewServeMux(),
+		port:           c.Port,
+		host:           c.Host,
+		crt:            c.CRT,
+		key:            c.Key,
+		defaultOptions: c.DefaultOptions,
+		middleware:     make([]Handler, 0),
 	}
 }
 
@@ -71,6 +112,13 @@ func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 		handlers: []Handler{},
 		index:    -1,
 	}
+}
+
+func (m *Mux) addOptions() {
+	m.Options("/*", func(ctx *Ctx) error {
+		ctx.Status(status.OK)
+		return nil
+	})
 }
 
 func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
@@ -96,6 +144,11 @@ func (m *Mux) Use(middleware ...Handler) {
 	}
 
 	m.middleware = append(m.middleware, middleware...)
+}
+
+func (m *Mux) Handler(path string, handler Handler, middleware ...Handler) {
+	slog.Info("HANDLER " + path)
+	m.mux.HandleFunc(path, m.Make(handler, middleware...))
 }
 
 func (m *Mux) Get(path string, handler Handler, middleware ...Handler) {
@@ -148,12 +201,20 @@ func (m *Mux) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (m *Mux) ListenAndServe() error {
+	if m.defaultOptions {
+		m.addOptions()
+	}
+
 	fmt.Print(amp)
 
 	return http.ListenAndServe(fmt.Sprintf("%s:%d", m.host, m.port), m.mux)
 }
 
 func (m *Mux) ListenAndServeTLS() error {
+	if m.defaultOptions {
+		m.addOptions()
+	}
+
 	if m.crt == "" || m.key == "" {
 		return errors.New("error, no crt or key given")
 	}

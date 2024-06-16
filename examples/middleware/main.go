@@ -36,6 +36,8 @@ func postHandler() amp.Handler {
 			return err
 		}
 
+		fmt.Println(i)
+
 		return ctx.RenderJSON(status.OK, i)
 	}
 }
