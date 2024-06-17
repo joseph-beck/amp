@@ -67,6 +67,6 @@ func Default() Config {
 		MaxAge:                 0,
 		AllowCredentials:       true,
 		AllowPrivateNetwork:    false,
-		Debug:                  true,
+		Debug:                  false,
 	}
 }
