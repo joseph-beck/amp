@@ -248,6 +248,11 @@ func (ctx *Ctx) Status(status int) {
 	ctx.writer.WriteHeader(status)
 }
 
+// Get the status of the current Ctx.
+func (ctx *Ctx) GetStatus() int {
+	return ctx.status
+}
+
 // Checks if the Ctx has been aborted.
 func (ctx *Ctx) Aborted() bool {
 	return ctx.aborted

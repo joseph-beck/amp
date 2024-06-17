@@ -456,14 +456,32 @@ func TestCtxQueryBool(t *testing.T) {
 func TestCtxStatus(t *testing.T) {
 	amp := New()
 
-	amp.Get("/test/one", func(ctx *Ctx) error {
+	amp.Get("/test", func(ctx *Ctx) error {
 		ctx.Status(status.OK)
 		assert.Equal(t, status.OK, ctx.status)
 
 		return nil
 	})
 
-	request := httptest.NewRequest("GET", "/test/one", nil)
+	request := httptest.NewRequest("GET", "/test", nil)
+	writer := httptest.NewRecorder()
+	amp.ServeHTTP(writer, request)
+}
+
+func TestCtxGetStatus(t *testing.T) {
+	amp := New()
+
+	amp.Get("/test", func(ctx *Ctx) error {
+		ctx.Status(status.OK)
+		assert.Equal(t, status.OK, ctx.GetStatus())
+
+		ctx.Status(status.BadRequest)
+		assert.Equal(t, status.BadRequest, ctx.GetStatus())
+
+		return nil
+	})
+
+	request := httptest.NewRequest("GET", "/test", nil)
 	writer := httptest.NewRecorder()
 	amp.ServeHTTP(writer, request)
 }
