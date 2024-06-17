@@ -1,3 +1,7 @@
+// Github Repository: https://github.com/joseph-beck/amp
+// GoDocs: https://pkg.go.dev/github.com/joseph-beck/amp
+
+// Package Status is used to define HTTP Status codes used within Amp.
 package status
 
 const (
@@ -10,6 +14,7 @@ const (
 	RevalidationFailed    = 111
 	DisconnectedOperation = 112
 	HeuristicExpiration   = 113
+
 	// Success
 	OK                          = 200
 	Created                     = 201
@@ -22,6 +27,7 @@ const (
 	AlreadyReported             = 208
 	ThisIsFine                  = 218 // unofficial
 	ImUsed                      = 226
+
 	// Redirection
 	MultipleChoices   = 300
 	MovedPermanently  = 301
@@ -32,6 +38,7 @@ const (
 	SwitchProxy       = 306
 	TemporaryRedirect = 307
 	PermanentRedirect = 308
+
 	// Client Errors
 	BadRequest                       = 400
 	Unauthorized                     = 401
@@ -68,6 +75,7 @@ const (
 	UnavailableForLegalReasons       = 451
 	InvalidToken                     = 498 // Unofficial
 	TokenRequired                    = 499 // Unofficial
+
 	// Server Errors
 	InternalServerError           = 500
 	NotImplemented                = 501
