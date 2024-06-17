@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"sync"
 
 	"github.com/joseph-beck/amp/pkg/status"
 )
@@ -117,21 +116,8 @@ func New(args ...Config) Mux {
 	}
 }
 
-func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
-	return &Ctx{
-		writer:  w,
-		request: r,
-		status:  status.OK,
-		aborted: false,
-
-		values:   make(map[string]any),
-		valuesMu: sync.Mutex{},
-
-		handlers: []Handler{},
-		index:    -1,
-	}
-}
-
+// Adds the default options for the Mux.
+// Mostly used with cors pre-flight checks.
 func (m *Mux) addOptions() {
 	m.Options("/*", func(ctx *Ctx) error {
 		ctx.Status(status.OK)

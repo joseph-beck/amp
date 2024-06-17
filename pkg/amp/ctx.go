@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/joseph-beck/amp/pkg/binding"
+	"github.com/joseph-beck/amp/pkg/status"
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -23,17 +24,58 @@ var (
 	plainContentType = []string{"text/plain; charset=utf-8"}
 )
 
+// Ctx for storing information about the request, and for responding back.
+// All members are unexported, but will often have access via the Ctx methods.
 type Ctx struct {
-	writer  http.ResponseWriter
+	// Stores the writer of the context.
+	// There are many shortcuts for accessing specific parts of the writer.
+	// To get the http.ResponseWriter use Ctx.Writer().
+	writer http.ResponseWriter
+
+	// Stores the request of the context.
+	// There are many shortcuts for accessing specific parts of the request.
+	// To get the *http.Request use Ctx.Request().
 	request *http.Request
-	status  int
+
+	// Stores the current status of the context.
+	// This is also written to the writer above.
+	status int
+
+	// Has the current context been aborted?
+	// This will be false by default.
 	aborted bool
 
-	values   map[string]any
+	// Store any items relevant to the context.
+	// Uses a key of type string but can be any type.
+	values map[string]any
+
+	// A mutex for altering the values of the Ctx.
+	// This is used to prevent any data races when altering values.
 	valuesMu sync.Mutex
 
+	// Stores the Handlers that the context will use.
+	// This is often altered within the Mux itself,
+	// adding middleware and other functionality.
+	// This is by default []Handler{}.
 	handlers []Handler
-	index    int
+
+	// Stores the index or the current handler that we are on.
+	// When creating a new context, this starts of at -1.
+	index int
+}
+
+// Create a new context with a writer and a request.
+func newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
+	return &Ctx{
+		writer:   w,
+		request:  r,
+		status:   status.OK,
+		aborted:  false,
+		values:   make(map[string]any),
+		valuesMu: sync.Mutex{},
+		handlers: []Handler{},
+		index:    -1,
+	}
 }
 
 // Write the content type of the writer of the Ctx.
