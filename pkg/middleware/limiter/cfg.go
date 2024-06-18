@@ -14,18 +14,18 @@ import (
 // Configure the Amp Limiter middleware.
 type Config struct {
 	// Using the amp.Ctx, the middleware can be skipped if this function returns true.
-	// When using the Default(), Skip will be nil.
-	Skip func(ctx *amp.Ctx) bool
+	// When using the Default(), SkipFunc will be nil.
+	SkipFunc func(ctx *amp.Ctx) bool
 
 	// Handler that if the rate limit is reached, will go to this Handler instead.
 	// The Handler will be ran before being aborted by the middleware.
-	// When using the Default(), Next will be nil.
-	Next amp.Handler
+	// When using the Default(), NextFunc will be nil.
+	NextFunc amp.Handler
 
 	// Allows you to generate custom keys based on the value returned from this function.
 	// The default key generator will use the host address of the request.
-	// When using the Default(), KeyGenerator will be nil.
-	KeyGenerator func(ctx *amp.Ctx) string
+	// When using the Default(), KeyGeneratorFunc will be nil.
+	KeyGeneratorFunc func(ctx *amp.Ctx) string
 
 	// Maximum number of tries that can be done before being rate limited.
 	// When the user is rate limited they will be sent a status.Locked or a 423.
@@ -56,8 +56,8 @@ type Config struct {
 // Returns the default configuration for the rate limiter.
 func Default() Config {
 	return Config{
-		Skip:        nil,
-		Next:        nil,
+		SkipFunc:    nil,
+		NextFunc:    nil,
 		Limit:       10,
 		Duration:    1 * time.Minute,
 		LimitCode:   status.Locked,

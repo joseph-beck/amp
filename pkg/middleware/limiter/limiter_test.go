@@ -18,8 +18,8 @@ func TestNew(t *testing.T) {
 		ctx.Status(status.OK)
 		return nil
 	}, New(Config{
-		Skip:        nil,
-		Next:        nil,
+		SkipFunc:    nil,
+		NextFunc:    nil,
 		Limit:       1,
 		Duration:    1 * time.Minute,
 		LimitCode:   status.Locked,
@@ -41,8 +41,8 @@ func TestNew(t *testing.T) {
 		ctx.Status(status.OK)
 		return nil
 	}, New(Config{
-		Skip: nil,
-		Next: func(ctx *amp.Ctx) error {
+		SkipFunc: nil,
+		NextFunc: func(ctx *amp.Ctx) error {
 			ctx.Status(status.BadRequest)
 			return nil
 		},
@@ -67,11 +67,11 @@ func TestNew(t *testing.T) {
 		ctx.Status(status.OK)
 		return nil
 	}, New(Config{
-		Skip: func(ctx *amp.Ctx) bool {
+		SkipFunc: func(ctx *amp.Ctx) bool {
 			log.Println(ctx.Origin())
 			return ctx.Origin() == "example.com"
 		},
-		Next: func(ctx *amp.Ctx) error {
+		NextFunc: func(ctx *amp.Ctx) error {
 			return nil
 		},
 		Limit:       1,
@@ -95,8 +95,8 @@ func TestNew(t *testing.T) {
 		ctx.Status(status.OK)
 		return nil
 	}, New(Config{
-		Skip:        nil,
-		Next:        nil,
+		SkipFunc:    nil,
+		NextFunc:    nil,
 		Limit:       0,
 		Duration:    1 * time.Minute,
 		LimitCode:   status.Locked,
@@ -109,8 +109,8 @@ func TestNew(t *testing.T) {
 		ctx.Status(status.OK)
 		return nil
 	}, New(Config{
-		Skip:        nil,
-		Next:        nil,
+		SkipFunc:    nil,
+		NextFunc:    nil,
 		Limit:       1,
 		Duration:    0 * time.Minute,
 		LimitCode:   status.Locked,

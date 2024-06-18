@@ -15,15 +15,15 @@ import (
 
 // unexported limiter struct, used to store our rate limiter settings privately.
 type limiter struct {
-	// unexported skip function.
-	skip func(ctx *amp.Ctx) bool
+	// unexported skipFunc function.
+	skipFunc func(ctx *amp.Ctx) bool
 
-	// unexported next handler.
-	next amp.Handler
+	// unexported nextFunc handler.
+	nextFunc amp.Handler
 
-	// unexported keyGenerator.
+	// unexported keyGeneratorFunc.
 	// if we are not given a key generator, a default one using the origin is created.
-	keyGenerator func(ctx *amp.Ctx) string
+	keyGeneratorFunc func(ctx *amp.Ctx) string
 
 	// unexported limit.
 	// if the limit is 0, an empty handler is returned instead.
@@ -68,20 +68,20 @@ func New(args ...Config) amp.Handler {
 	}
 
 	// lets set skip if we have a skip func.
-	if cfg.Skip != nil {
-		limiter.skip = cfg.Skip
+	if cfg.SkipFunc != nil {
+		limiter.skipFunc = cfg.SkipFunc
 	}
 
 	// lets set next if we have a next handler.
-	if cfg.Next != nil {
-		limiter.next = cfg.Next
+	if cfg.NextFunc != nil {
+		limiter.nextFunc = cfg.NextFunc
 	}
 
 	// default key generator uses the origin as a key.
-	if cfg.KeyGenerator != nil {
-		limiter.keyGenerator = cfg.KeyGenerator
+	if cfg.KeyGeneratorFunc != nil {
+		limiter.keyGeneratorFunc = cfg.KeyGeneratorFunc
 	} else {
-		limiter.keyGenerator = func(ctx *amp.Ctx) string {
+		limiter.keyGeneratorFunc = func(ctx *amp.Ctx) string {
 			return ctx.Origin()
 		}
 	}
@@ -111,16 +111,16 @@ func New(args ...Config) amp.Handler {
 
 	return func(ctx *amp.Ctx) error {
 		// if we have a skip function, lets check if the ctx applies the skip.
-		if limiter.skip != nil {
-			if limiter.skip(ctx) {
+		if limiter.skipFunc != nil {
+			if limiter.skipFunc(ctx) {
 				return nil
 			}
 		}
 
 		// get our key, if we have a key generator use that, otherwise we get it from the origin.
 		key := func() string {
-			if limiter.keyGenerator != nil {
-				return limiter.keyGenerator(ctx)
+			if limiter.keyGeneratorFunc != nil {
+				return limiter.keyGeneratorFunc(ctx)
 			}
 
 			return ctx.Origin()
@@ -134,8 +134,8 @@ func New(args ...Config) amp.Handler {
 			ctx.Abort()
 
 			// if we have a custom next function, use it.
-			if limiter.next != nil {
-				err := limiter.next(ctx)
+			if limiter.nextFunc != nil {
+				err := limiter.nextFunc(ctx)
 				if err != nil {
 					return err
 				}
