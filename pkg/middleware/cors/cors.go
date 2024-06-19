@@ -94,6 +94,7 @@ func New(args ...Config) amp.Handler {
 			ctx.Header("Access-Control-Allow-Origin", "*")
 			ctx.Header("Access-Control-Allow-Methods", "*")
 			ctx.Header("Access-Control-Allow-Credentials", "true")
+			ctx.Header("Access-Control-Allow-Headers", "Content-Type")
 
 			res := cors.allowOriginFunc(ctx.Request(), ctx.Origin())
 			if res {
