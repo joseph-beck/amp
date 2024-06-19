@@ -92,6 +92,9 @@ func New(args ...Config) amp.Handler {
 	return func(ctx *amp.Ctx) error {
 		if cors.allowOriginFunc != nil {
 			ctx.Header("Access-Control-Allow-Origin", "*")
+			ctx.Header("Access-Control-Allow-Methods", "*")
+			ctx.Header("Access-Control-Allow-Credentials", "true")
+
 			res := cors.allowOriginFunc(ctx.Request(), ctx.Origin())
 			if res {
 				return nil
