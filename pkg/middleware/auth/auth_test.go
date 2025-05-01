@@ -29,7 +29,7 @@ func TestNew(t *testing.T) {
 		ctx.Status(status.OK)
 		return nil
 	}, New(Config{
-		AuthFunc: authFunc,
+		AuthFunc:     authFunc,
 		NoAccessFunc: nil,
 		NoAccessCode: status.Unauthorized,
 	}))

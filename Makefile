@@ -27,7 +27,7 @@ fmt:
 test:
 	$(GO) clean -testcache
 	$(GO) mod tidy
-	$(GO) test -cover $(GOMODULES)
+	$(GO) test -cover ./...
 
 .phony: update
 update:
