@@ -1,7 +1,7 @@
 // Github Repository: https://github.com/joseph-beck/amp
 // GoDocs: https://pkg.go.dev/github.com/joseph-beck/amp
 
-// Package Limiter is a middleware used for rate limitting requests.
+// Package Limiter is a middleware used for rate limiting requests.
 package limiter
 
 import (

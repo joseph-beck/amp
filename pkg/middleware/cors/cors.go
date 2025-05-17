@@ -19,7 +19,7 @@ type cors struct {
 	// unexported allowedOrigins, converted from array to string.
 	allowedOrigins string
 
-	// unexported allowedOriginFimc, converts AllowOriginFunc or AllowOriginRequestFunc to this.
+	// unexported allowedOriginFunc, converts AllowOriginFunc or AllowOriginRequestFunc to this.
 	allowOriginFunc func(request *http.Request, origin string) bool
 
 	// unexported allowedMethods, converted from array to string.
@@ -40,7 +40,7 @@ type cors struct {
 	// unexported allowPrivateNetwork.
 	allowPrivateNetwork bool
 
-	// unexorted debug.
+	// unexported debug.
 	debug bool
 }
 

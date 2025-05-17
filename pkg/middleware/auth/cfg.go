@@ -17,7 +17,7 @@ type Config struct {
 	AuthFunc func(ctx *amp.Ctx) bool
 
 	// NoAccessFunc determines what happens if no access is granted by AuthFunc, or false is returned.
-	// When access is granted it simpy moves to the next handler and this is not used.
+	// When access is granted it simply moves to the next handler and this is not used.
 	// If this is nil, then NoAccessCode is given and the Ctx aborted.
 	// When using Default(), NoAccessFunc is nil.
 	NoAccessFunc amp.Handler

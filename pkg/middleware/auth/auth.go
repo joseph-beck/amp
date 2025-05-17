@@ -22,7 +22,7 @@ type auth struct {
 	noAccessCode int
 }
 
-// Create a new Authorization Middelware.
+// Create a new Authorization Middleware.
 // If no config is given the Default() config is used,
 // this will result in being given an empty handler.
 func New(args ...Config) amp.Handler {

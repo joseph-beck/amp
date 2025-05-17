@@ -102,7 +102,7 @@ type Mux struct {
 
 // Returns a new Mux.
 // Uses the given config, if len of args is greater than 0.
-// Otherwises uses the default configuration.
+// Otherwise uses the default configuration.
 func New(args ...Config) Mux {
 	c := Default()
 
@@ -144,7 +144,7 @@ func (m *Mux) Make(handler Handler, middleware ...Handler) http.HandlerFunc {
 		ctx.handlers = append(ctx.handlers, middleware...)
 		ctx.handlers = append(ctx.handlers, handler)
 
-		// using iteration is preffered here.
+		// using iteration is preferred here.
 		// can still use Next for recursive Handler calling, less optimal.
 		for i, h := range ctx.handlers {
 			// we can skip within our handlers, if the index does not match, lets keep iterating.

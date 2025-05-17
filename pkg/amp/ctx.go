@@ -435,12 +435,12 @@ func (ctx *Ctx) RenderHTML(status int, file string) error {
 	return nil
 }
 
-// Returns an error if any binding errors occur with object, does not enforce any behaviour.
+// Returns an error if any binding errors occur with object, does not enforce any behavior.
 func (ctx *Ctx) ShouldBindWith(obj any, binder binding.Binder) error {
 	return binder.Bind(ctx.request, obj)
 }
 
-// Enforces that an object has binded, otherwise an error is returned and the context is aborted.
+// Enforces that an object has bound, otherwise an error is returned and the context is aborted.
 func (ctx *Ctx) MustBindWith(obj any, binder binding.Binder) error {
 	err := ctx.ShouldBindWith(obj, binder)
 	if err != nil {

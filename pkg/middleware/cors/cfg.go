@@ -19,7 +19,7 @@ type Config struct {
 	AllowedOrigins []string
 
 	// A custom function that can validate an origin.
-	// It takes the origin as an argumnent, which it can use to validate access.
+	// It takes the origin as an argument, which it can use to validate access.
 	// If this is not nil, the values of AllowedOrigins are ignored.
 	AllowOriginFunc func(origin string) bool
 
@@ -40,7 +40,7 @@ type Config struct {
 	// When using Default(), ExposedHeaders will be []string{}.
 	ExposedHeaders []string
 
-	// MaxAge is used to indicate how long, in seconds, a preflight reqeust can be cached.
+	// MaxAge is used to indicate how long, in seconds, a preflight request can be cached.
 	// When the value is 0 there is no caching of the preflight request.
 	// If you need to force a a MaxAge of 0, use a negative number such as -1.
 	// When using Default(), MaxAge will be 0.
