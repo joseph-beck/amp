@@ -36,7 +36,7 @@ func (i *item) increment() {
 
 // checks if the items time since request has expired.
 func (i *item) expired(duration time.Duration) bool {
-	return time.Since(i.timeSinceRequest) > duration
+	return time.Since(i.timeSinceRequest) >= duration
 }
 
 // use to store a map[string]any of key for the rate limiter.
