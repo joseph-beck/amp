@@ -3,6 +3,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/joseph-beck/amp/go.yml?label=checks)
 ![GitHub Release](https://img.shields.io/github/v/release/joseph-beck/amp)
 ![GitHub License](https://img.shields.io/github/license/joseph-beck/amp)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/joseph-beck/amp?label=go)
 
 ## about
 
