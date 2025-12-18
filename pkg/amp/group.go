@@ -1,5 +1,6 @@
 package amp
 
+// Group struct, used to group routes with a common prefix and middleware.
 type group struct {
 	// Prefix used for all routes in this group.
 	// For example "/api/v1"
@@ -14,16 +15,38 @@ type group struct {
 	middleware []Handler
 }
 
+// Internal struct to store handler configuration within a group.
 type handlerConfig struct {
-	method     string
-	path       string
-	handler    Handler
+	// HTTP method of the handler
+	// e.g. GET, POST, PUT, DELETE, etc.
+	method string
+
+	// Path of the handler.
+	// This is without the group prefix.
+	path string
+
+	// The handler function itself.
+	handler Handler
+
+	// Any middleware specific to this route.
+	// These are applied after the group middleware.
 	middleware []Handler
 }
 
 // Create a new group with a given prefix and optional middleware.
 // Uses a variadic variable here, can give one or many middlewares here.
 // All routes in this group will use these middlewares.
+//
+//	g := amp.Group("/group")
+//	g.Get("/hello", func(ctx *amp.Ctx) error {
+//			return ctx.Render(200, "hello world!")
+//	})
+//
+//	a := amp.New()
+//
+//	a.Group(g)
+//
+// Can now use the route /group/hello
 func Group(prefix string, middleware ...Handler) group {
 	if len(middleware) < 1 {
 		middleware = make([]Handler, 0)
