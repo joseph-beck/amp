@@ -12,7 +12,7 @@ type group struct {
 	prefix string
 
 	// All handlers used in the group.
-	// This internal struct store the method, path, handler and any middleware for each handler.
+	// This internal struct stores the method, path, handler and any middleware for each handler.
 	handlers []handlerConfig
 
 	// All middlewares that are applied to this group.
@@ -53,10 +53,6 @@ type handlerConfig struct {
 //
 // Can now use the route /group/hello
 func Group(prefix string, middleware ...Handler) group {
-	if len(middleware) < 1 {
-		middleware = make([]Handler, 0)
-	}
-
 	return group{
 		prefix:     prefix,
 		handlers:   make([]handlerConfig, 0),

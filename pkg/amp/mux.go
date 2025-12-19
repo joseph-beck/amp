@@ -296,7 +296,7 @@ func (m *Mux) Trace(path string, handler Handler, middleware ...Handler) {
 	m.mux.HandleFunc(fmt.Sprintf("TRACE %s", path), m.Make(handler, middleware...))
 }
 
-// Create a group of routes with a given group.
+// Create a group of routes with a given prefix.
 // All routes within the group will have the prefix of the group added to their path.
 // All middleware within the group will be applied to all routes within the group.
 // Middleware given to individual routes will also be applied to those routes.
@@ -339,6 +339,11 @@ func (m *Mux) Group(group group) {
 			m.Connect(path, handler.handler, middleware...)
 		case "TRACE":
 			m.Trace(path, handler.handler, middleware...)
+		default:
+			slog.Error("method not recognised, failed to add route",
+				"method", handler.method,
+				"path", path,
+			)
 		}
 	}
 }
