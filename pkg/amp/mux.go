@@ -1,4 +1,4 @@
-// Github Repository: https://github.com/joseph-beck/amp
+// GitHub Repository: https://github.com/joseph-beck/amp
 // GoDocs: https://pkg.go.dev/github.com/joseph-beck/amp
 
 // Package Amp is a web framework made using the Go 1.22 Mux.
@@ -296,6 +296,58 @@ func (m *Mux) Trace(path string, handler Handler, middleware ...Handler) {
 	m.mux.HandleFunc(fmt.Sprintf("TRACE %s", path), m.Make(handler, middleware...))
 }
 
+// Create a group of routes with a given prefix.
+// All routes within the group will have the prefix of the group added to their path.
+// All middleware within the group will be applied to all routes within the group.
+// Middleware given to individual routes will also be applied to those routes.
+//
+//	g := amp.Group("/group")
+//	g.Get("/hello", func(ctx *amp.Ctx) error {
+//			return ctx.Render(200, "hello world!")
+//	})
+//
+//	a := amp.New()
+//
+//	a.Group(g)
+//
+// Can now use the route /group/hello
+func (m *Mux) Group(group group) {
+	slog.Info("GROUP " + group.prefix)
+	for _, handler := range group.handlers {
+		middleware := append([]Handler{}, group.middleware...)
+		middleware = append(middleware, handler.middleware...)
+		path := group.prefix + handler.path
+
+		switch handler.method {
+		case "HANDLER":
+			m.Handler(path, handler.handler, middleware...)
+		case "GET":
+			m.Get(path, handler.handler, middleware...)
+		case "POST":
+			m.Post(path, handler.handler, middleware...)
+		case "PUT":
+			m.Put(path, handler.handler, middleware...)
+		case "PATCH":
+			m.Patch(path, handler.handler, middleware...)
+		case "DELETE":
+			m.Delete(path, handler.handler, middleware...)
+		case "HEAD":
+			m.Head(path, handler.handler, middleware...)
+		case "OPTIONS":
+			m.Options(path, handler.handler, middleware...)
+		case "CONNECT":
+			m.Connect(path, handler.handler, middleware...)
+		case "TRACE":
+			m.Trace(path, handler.handler, middleware...)
+		default:
+			slog.Error("method not recognised, failed to add route",
+				"method", handler.method,
+				"path", path,
+			)
+		}
+	}
+}
+
 // Serve HTTP for the given writer and request.
 // Serves the current instance of routes in Mux.
 //
@@ -341,6 +393,7 @@ func (m *Mux) ListenAndServe() error {
 	}
 
 	fmt.Print(amp + "\n")
+	slog.Info(fmt.Sprintf("amp is running on %s:%d", m.host, m.port))
 
 	return http.ListenAndServe(fmt.Sprintf("%s:%d", m.host, m.port), m.mux)
 }

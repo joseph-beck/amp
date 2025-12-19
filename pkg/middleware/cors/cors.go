@@ -1,4 +1,4 @@
-// Github Repository: https://github.com/joseph-beck/amp
+// GitHub Repository: https://github.com/joseph-beck/amp
 // GoDocs: https://pkg.go.dev/github.com/joseph-beck/amp
 
 // Package Cors is a middleware used for cross-origin requests.
