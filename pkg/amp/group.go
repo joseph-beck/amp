@@ -59,6 +59,17 @@ func Group(prefix string, middleware ...Handler) group {
 	}
 }
 
+// Internal handler function, shortcut for generating a handlerConfig.
+// Appends handlerConfig to the group.
+func (g *group) handler(method string, path string, handler Handler, middleware ...Handler) {
+	g.handlers = append(g.handlers, handlerConfig{
+		method,
+		path,
+		handler,
+		middleware,
+	})
+}
+
 // Adds middleware to the group.
 // Uses a variadic variable here, can give one or many middlewares here.
 // All routes in this group will use these middlewares.
@@ -69,17 +80,6 @@ func (g *group) Use(middleware ...Handler) {
 // Get the prefix of the group.
 func (g group) Prefix() string {
 	return g.prefix
-}
-
-// Internal handler function, shortcut for generating a handlerConfig.
-// Appends handlerConfig to the group.
-func (g *group) handler(method string, path string, handler Handler, middleware ...Handler) {
-	g.handlers = append(g.handlers, handlerConfig{
-		method,
-		path,
-		handler,
-		middleware,
-	})
 }
 
 // Generic handler, this can be used for a variety of http methods unlike specified ones, like Get.
