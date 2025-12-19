@@ -46,6 +46,7 @@ func TestGroupHandler(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "HANDLER", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupGet(t *testing.T) {
@@ -56,6 +57,7 @@ func TestGroupGet(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "GET", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupPost(t *testing.T) {
@@ -66,6 +68,7 @@ func TestGroupPost(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "POST", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupPut(t *testing.T) {
@@ -76,6 +79,7 @@ func TestGroupPut(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "PUT", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupPatch(t *testing.T) {
@@ -86,7 +90,7 @@ func TestGroupPatch(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "PATCH", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
-	assert.Equal(t, "/hello", len(g.handlers[0].middleware))
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupDelete(t *testing.T) {
@@ -97,7 +101,7 @@ func TestGroupDelete(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "DELETE", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
-	assert.Equal(t, "/hello", len(g.handlers[0].middleware))
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupHead(t *testing.T) {
@@ -108,7 +112,7 @@ func TestGroupHead(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "HEAD", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
-	assert.Equal(t, "/hello", len(g.handlers[0].middleware))
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupOptions(t *testing.T) {
@@ -119,7 +123,7 @@ func TestGroupOptions(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "OPTIONS", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
-	assert.Equal(t, "/hello", len(g.handlers[0].middleware))
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupConnect(t *testing.T) {
@@ -130,7 +134,7 @@ func TestGroupConnect(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "CONNECT", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
-	assert.Equal(t, "/hello", len(g.handlers[0].middleware))
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
 
 func TestGroupTrace(t *testing.T) {
@@ -141,5 +145,5 @@ func TestGroupTrace(t *testing.T) {
 	assert.Equal(t, 1, len(g.handlers))
 	assert.Equal(t, "TRACE", g.handlers[0].method)
 	assert.Equal(t, "/hello", g.handlers[0].path)
-	assert.Equal(t, "/hello", len(g.handlers[0].middleware))
+	assert.Equal(t, 0, len(g.handlers[0].middleware))
 }
